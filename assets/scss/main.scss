@@ -1,0 +1,63 @@
+$primary-background-color: linear-gradient(290.96deg, rgba(156, 212, 110, 0.81) 21.71%, rgba(45, 58, 37, 0.81) 96.43%);
+
+body {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+body.front-page {
+    background: $primary-background-color;
+    background-attachment: fixed;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+.navigation-menu {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    align-items: center;
+    .navigation-container {
+        display: flex;
+        gap: 2rem;
+    }
+    .menu-button {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 2rem;
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+    .menu-logo {
+        width: 110px;
+    }
+}
+
+.landing-page-hero-section {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 78vh;
+    h1 {
+        color: white;
+        font-size: 7rem;
+        text-align: center;
+        position: absolute;
+        z-index: 1;
+        margin-bottom: 610px;
+    }
+    .landing-page-hero {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 750px;
+        width: 100%;
+        z-index: 2;
+        margin-bottom: 15px;
+    }
+}
