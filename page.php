@@ -6,6 +6,6 @@
     <title>Document</title>
 </head>
 <body>
-    <p>Teszt page.php</p>
+    <p>Teszt page5.php</p>
 </body>
 </html>
