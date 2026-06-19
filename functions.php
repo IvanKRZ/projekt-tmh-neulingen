@@ -139,13 +139,100 @@ function register_gallery_taxonomy() {
             'add_new_item'  => 'Neues Album',
             'edit_item'     => 'Album bearbeiten',
         ],
-        'hierarchical' => true, // mint a kategóriák
+        'hierarchical' => true,
         'public'       => true,
         'show_ui'      => true,
         'show_in_menu' => true,
     ]);
 }
 
+add_theme_support('title-tag');
+add_theme_support('custom-logo');
+
+register_nav_menus([
+    'nav-left'   => 'Navigation Links',
+    'nav-right'  => 'Navigation Rechts',
+    'nav-mobile' => 'Mobile Navigation',
+]);
+
+class TMH_Nav_Walker extends Walker_Nav_Menu {
+    public function start_lvl(&$output, $depth = 0, $args = null) {}
+    public function end_lvl(&$output, $depth = 0, $args = null) {}
+    public function start_el(&$output, $item, $depth = 0, $args = null, $id = 0) {
+        $output .= '<div role="listitem"><a class="menu-button" href="' . esc_url($item->url) . '" aria-label="' . esc_attr($item->title) . '">' . esc_html($item->title) . '</a></div>';
+    }
+    public function end_el(&$output, $item, $depth = 0, $args = null) {}
+}
+
+class TMH_Mobile_Walker extends Walker_Nav_Menu {
+    public function start_lvl(&$output, $depth = 0, $args = null) {}
+    public function end_lvl(&$output, $depth = 0, $args = null) {}
+    public function start_el(&$output, $item, $depth = 0, $args = null, $id = 0) {
+        $output .= '<a href="' . esc_url($item->url) . '">' . esc_html($item->title) . '</a>';
+    }
+    public function end_el(&$output, $item, $depth = 0, $args = null) {}
+}
+
+function tmh_customizer_settings($wp_customize) {
+    $wp_customize->add_section('tmh_donation', [
+        'title'    => 'Spendenbereich',
+        'priority' => 40,
+    ]);
+    $wp_customize->add_setting('gooding_iframe_src', [
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ]);
+    $wp_customize->add_control('gooding_iframe_src', [
+        'label'       => 'Gooding Widget URL',
+        'description' => 'Nur die src-URL aus dem iframe-Code einfügen',
+        'section'     => 'tmh_donation',
+        'type'        => 'url',
+    ]);
+}
+
+function tmh_register_training_cpt() {
+    register_post_type('training', [
+        'labels' => [
+            'name'          => 'Trainings',
+            'singular_name' => 'Training',
+            'add_new_item'  => 'Neues Training',
+            'edit_item'     => 'Training bearbeiten',
+            'not_found'     => 'Keine Trainings gefunden',
+        ],
+        'public'       => false,
+        'show_ui'      => true,
+        'show_in_menu' => true,
+        'supports'     => ['title', 'editor', 'thumbnail', 'page-attributes'],
+        'menu_icon'    => 'dashicons-pets',
+        'rewrite'      => false,
+    ]);
+}
+
+function tmh_allow_iframe($tags, $context) {
+    if ($context === 'post') {
+        $tags['iframe'] = [
+            'src'              => true,
+            'title'            => true,
+            'name'             => true,
+            'id'               => true,
+            'sandbox'          => true,
+            'scrolling'        => true,
+            'frameborder'      => true,
+            'allowtransparency' => true,
+            'allowfullscreen'  => true,
+            'width'            => true,
+            'height'           => true,
+            'class'            => true,
+            'style'            => true,
+        ];
+    }
+    return $tags;
+}
+
+add_action('customize_register', 'tmh_customizer_settings');
+add_filter('wp_kses_allowed_html', 'tmh_allow_iframe', 10, 2);
+add_action('init', 'tmh_register_training_cpt');
+add_action('customize_register', 'tmh_customizer_settings');
 add_action('wp_footer', 'lightbox_config');
 add_action('init', 'register_gallery_taxonomy');
 add_action('after_setup_theme', 'theme_setup');

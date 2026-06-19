@@ -16,7 +16,7 @@ get_header(); ?>
 
     <?php if (!empty($albums) && !is_wp_error($albums)) : ?>
         <div class="gallery-filter" role="group" aria-label="Album-Filter">
-            <button class="filter-btn is-active" data-album="all" >Alle</button>
+            <button class="filter-btn is-active" data-album="all">Alle</button>
             <?php foreach ($albums as $album) : ?>
                 <button class="filter-btn" data-album="<?php echo $album->slug; ?>">
                     <?php echo $album->name; ?>
@@ -43,7 +43,7 @@ get_header(); ?>
                     <a href="<?php the_post_thumbnail_url('full'); ?>"
                         data-lightbox="gallery"
                         data-title="<?php the_title(); ?>">
-                        <?php the_post_thumbnail('medium'); ?>
+                        <?php the_post_thumbnail('full', ['loading' => 'lazy', 'decoding' => 'async']); ?>
                     </a>
                     <p><?php the_title(); ?></p>
                 </div>

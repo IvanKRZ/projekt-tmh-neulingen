@@ -1,53 +1,86 @@
-<?php wp_head(); ?>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+    <meta charset="<?php bloginfo('charset'); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?php wp_head(); ?>
 </head>
-<body>
-    <body <?php body_class(); ?>>
-    <div class="loading-screen" id="loadingScreen">
-        <img src="<?php echo get_template_directory_uri(); ?>/assets/images/loading-1.png" 
-         alt="Loading" id="loadingImg">
-        <h1 id="loadingText"></h1>
+<body <?php body_class(); ?>>
+
+<a href="#main-content"
+   style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;"
+   onfocus="this.style.cssText='position:fixed;top:0;left:0;width:auto;height:auto;padding:1rem 2rem;background:#000;color:#fff;font-size:1rem;z-index:99999;'">
+    Zum Hauptinhalt springen
+</a>
+
+<div class="loading-screen" id="loadingScreen" aria-hidden="true">
+    <img src="<?php echo esc_url(get_template_directory_uri()); ?>/assets/images/loading-1.webp"
+         alt="" id="loadingImg" aria-hidden="true">
+    <h1 id="loadingText" aria-live="polite"></h1>
+</div>
+
+<nav class="navigation-menu" id="navMenu" aria-label="Hauptnavigation">
+
+    <div class="navigation-container left-navigation-container" role="list">
+        <?php wp_nav_menu([
+            'theme_location' => 'nav-left',
+            'container'      => false,
+            'items_wrap'     => '%3$s',
+            'walker'         => new TMH_Nav_Walker(),
+            'fallback_cb'    => false,
+        ]); ?>
     </div>
-    <nav class="navigation-menu" id="navMenu" aria-label="Hauptnavigation">
-        <div class="navigation-container left-navigation-container" role="list">
-            <div role="listitem">
-                <a class="menu-button" href="<?php echo get_permalink(get_page_by_path('aktuelles')) ?>" aria-label="Aktuelles">
-                    Aktuelles
-                </a>
-            </div>
-            <div role="listitem">
-                <a class="menu-button" href="<?php echo get_permalink(get_page_by_path('training')) ?>" aria-label="Training">
-                    Training
-                </a>
-            </div>
-        </div>
-        <a href="<?php echo esc_url(home_url('/')); ?>" aria-label="Zur Startseite">
-            <img class="menu-logo" src="<?php echo get_template_directory_uri(); ?>/assets/images/logo.png" alt="TMH Neulingen Logo">
-        </a>
-        <div class="navigation-container right-navigation-container" role="list">
-            <div role="listitem">
-                <a class="menu-button" href="<?php echo get_permalink(get_page_by_path('uberuns')) ?>" aria-label="Über uns">
-                    Über uns
-                </a>
-            </div>
-            <div role="listitem">
-                <a class="menu-button" href="<?php echo get_permalink(get_page_by_path('galerie')) ?>" aria-label="Galerie">
-                    Galerie
-                </a>
-            </div>
-        </div>
-        <div class="hamburger-menu" id="hamburgerMenu">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <div class="mobile-menu" id="mobileMenu">
-            <a href="<?php echo get_permalink(get_page_by_path('/')) ?>">Homepage</a>
-            <a href="<?php echo get_permalink(get_page_by_path('aktuelles')) ?>">Aktuelles</a>
-            <a href="<?php echo get_permalink(get_page_by_path('training')) ?>">Training</a>
-            <a href="<?php echo get_permalink(get_page_by_path('uberuns')) ?>">Über uns</a>
-            <a href="<?php echo get_permalink(get_page_by_path('galerie')) ?>">Galerie</a>
-            <a href="<?php echo get_permalink(get_page_by_path('contact')) ?>">Kontakt</a>
-            <a href="<?php echo get_permalink(get_page_by_path('kalender')) ?>">Kalender</a>
-        </div>
-    </nav>
+
+    <a href="<?php echo esc_url(home_url('/')); ?>"
+       aria-label="Zur Startseite – <?php bloginfo('name'); ?>">
+        <?php
+        $custom_logo_id = get_theme_mod('custom_logo');
+        if ($custom_logo_id) :
+            $logo_url = wp_get_attachment_image_url($custom_logo_id, 'full');
+        ?>
+            <img class="menu-logo"
+                 src="<?php echo esc_url($logo_url); ?>"
+                 alt="<?php bloginfo('name'); ?> Logo">
+        <?php else : ?>
+            <img class="menu-logo"
+                 src="<?php echo esc_url(get_template_directory_uri()); ?>/assets/images/logo.png"
+                 alt="<?php bloginfo('name'); ?> Logo">
+        <?php endif; ?>
+    </a>
+
+    <div class="navigation-container right-navigation-container" role="list">
+        <?php wp_nav_menu([
+            'theme_location' => 'nav-right',
+            'container'      => false,
+            'items_wrap'     => '%3$s',
+            'walker'         => new TMH_Nav_Walker(),
+            'fallback_cb'    => false,
+        ]); ?>
+    </div>
+
+    <div class="hamburger-menu" id="hamburgerMenu"
+         role="button"
+         tabindex="0"
+         aria-expanded="false"
+         aria-controls="mobileMenu"
+         aria-label="Menü öffnen">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu"
+         aria-hidden="true"
+         role="navigation"
+         aria-label="Mobile Navigation">
+        <?php wp_nav_menu([
+            'theme_location' => 'nav-mobile',
+            'container'      => false,
+            'items_wrap'     => '%3$s',
+            'walker'         => new TMH_Mobile_Walker(),
+            'fallback_cb'    => false,
+        ]); ?>
+    </div>
+
+</nav>
