@@ -26,16 +26,14 @@ get_header(); ?>
     <section class="donation-section" aria-label="Spendenbereich">
         <?php $gooding_url = get_theme_mod('gooding_iframe_src'); ?>
         <?php if ($gooding_url) : ?>
-            <section class="donation-section" aria-label="Spendenbereich">
-                <iframe
-                    sandbox="allow-top-navigation allow-forms allow-popups-to-escape-sandbox allow-same-origin allow-popups allow-scripts"
-                    frameborder="0"
-                    allowtransparency="true"
-                    scrolling="yes"
-                    title="Gooding Spendenbereich – TMH Neulingen"
-                    src="<?php echo esc_url($gooding_url); ?>">
-                </iframe>
-            </section>
+                    <iframe
+                        sandbox="allow-top-navigation allow-forms allow-popups-to-escape-sandbox allow-same-origin allow-popups allow-scripts"
+                        frameborder="0"
+                        allowtransparency="true"
+                        scrolling="yes"
+                        title="Gooding Spendenbereich – TMH Neulingen"
+                        src="<?php echo esc_url($gooding_url); ?>">
+                    </iframe>
         <?php endif; ?>
     </section>
 

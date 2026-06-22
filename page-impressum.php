@@ -5,8 +5,8 @@
 get_header();
 ?>
 
-<main id="main-content">
-    <section class="legal-class" aria-label="Impressum">
+<main>
+    <section class="legal-class" aria-labelledby="impressum-heading">
         <?php the_content(); ?>
     </section>
 
@@ -14,18 +14,20 @@ get_header();
     {
         "@context": "https://schema.org",
         "@type": "NGO",
-        "name": "Teamwork Mensch & Hund Neulingen e.V.",
-        "url": "<?php echo esc_url(home_url('/')); ?>",
+        "name": "TMH Neulingen – Teamwork Mensch & Hund e. V.",
+        "url": "https://tmh-neulingen.de",
+        "email": "info@tmh-neulingen.de",
         "address": {
             "@type": "PostalAddress",
-            "streetAddress": "Göbricher Straße 25",
+            "streetAddress": "Hinten auf der Hub 2/1",
             "postalCode": "75245",
-            "addressLocality": "Neulingen",
+            "addressLocality": "Neulingen-Bauschlott",
             "addressCountry": "DE"
         }
     }
     </script>
 </main>
 
+<?php get_template_part('legal-elements'); ?>
 <?php get_template_part('floating-buttons'); ?>
 <?php get_footer(); ?>

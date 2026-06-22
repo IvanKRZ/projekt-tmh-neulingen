@@ -5,8 +5,8 @@
 get_header();
 ?>
 
-<main>
-    <section class="legal-class" aria-labelledby="datenschutz-heading">
+<main id="main-content">
+    <section class="legal-class" aria-label="Datenschutzerklärung">
         <?php the_content(); ?>
     </section>
 
@@ -15,15 +15,15 @@ get_header();
         "@context": "https://schema.org",
         "@type": "WebPage",
         "name": "Datenschutzerklärung",
-        "url": "https://tmh-neulingen.de/datenschutz",
+        "url": "<?php echo esc_url(get_permalink(get_page_by_path('datenschutz'))); ?>",
         "publisher": {
             "@type": "NGO",
-            "name": "TMH Neulingen – Teamwork Mensch & Hund e. V."
+            "name": "Teamwork Mensch & Hund Neulingen e.V.",
+            "url": "<?php echo esc_url(home_url('/')); ?>"
         }
     }
     </script>
 </main>
 
-<?php get_template_part('legal-elements'); ?>
 <?php get_template_part('floating-buttons'); ?>
 <?php get_footer(); ?>

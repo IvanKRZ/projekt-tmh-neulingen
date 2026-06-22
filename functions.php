@@ -13,10 +13,10 @@ function tmh_neulingen_style() {
 
     // Loading JS
     wp_enqueue_script(
-        'my-script',
+        'main-js',
         get_template_directory_uri() . '/assets/js/main.js',
         [],
-        '1.0',
+        filemtime(get_template_directory() . '/assets/js/main.js'),
         true
     );
 }
@@ -105,10 +105,10 @@ function register_gallery_post_type() {
 
 function enqueue_lightbox() {
     wp_enqueue_style(
-        'lightbox',
+        'lightbox-css',
         get_template_directory_uri() . '/assets/css/lightbox.css',
         [],
-        '2.11.4'
+        filemtime(get_template_directory() . '/assets/css/lightbox.css')
     );
     wp_enqueue_script(
         'lightbox',
@@ -229,6 +229,175 @@ function tmh_allow_iframe($tags, $context) {
     return $tags;
 }
 
+function tmh_register_nav_menus() {
+    register_nav_menus([
+        'training_page_nav' => 'Training Seite Navigation',
+    ]);
+}
+
+function tmh_homepage_customizer($wp_customize) {
+    $wp_customize->add_section('tmh_homepage', [
+        'title'    => 'Startseite',
+        'priority' => 30,
+    ]);
+
+    $wp_customize->add_setting('homepage_hero_title', [
+        'default'           => 'TMH Neulingen',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('homepage_hero_title', [
+        'label'   => 'Hero-Titel',
+        'section' => 'tmh_homepage',
+        'type'    => 'text',
+    ]);
+
+    $wp_customize->add_setting('homepage_hero_image', [
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ]);
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'homepage_hero_image', [
+        'label'   => 'Hero-Bild',
+        'section' => 'tmh_homepage',
+    ]));
+
+    $wp_customize->add_setting('homepage_show_latest_aktuelles', [
+        'default'           => false,
+        'sanitize_callback' => 'rest_sanitize_boolean',
+    ]);
+    $wp_customize->add_control('homepage_show_latest_aktuelles', [
+        'label'   => 'Neuesten Aktuelles-Beitrag anzeigen',
+        'section' => 'tmh_homepage',
+        'type'    => 'checkbox',
+    ]);
+}
+
+// ============ KALENDER CPT ============
+function tmh_register_kalender_cpt() {
+    register_post_type('tmh_event', [
+        'labels' => [
+            'name'          => 'Termine',
+            'singular_name' => 'Termin',
+            'add_new_item'  => 'Neuen Termin hinzufügen',
+            'edit_item'     => 'Termin bearbeiten',
+            'not_found'     => 'Keine Termine gefunden',
+        ],
+        'public'       => false,
+        'show_ui'      => true,
+        'show_in_menu' => true,
+        'supports'     => ['title'],
+        'menu_icon'    => 'dashicons-calendar-alt',
+        'rewrite'      => false,
+    ]);
+}
+add_action('init', 'tmh_register_kalender_cpt');
+
+function tmh_event_meta_box_register() {
+    add_meta_box('tmh_event_details', 'Termindetails', 'tmh_event_meta_box_html', 'tmh_event', 'normal', 'high');
+}
+add_action('add_meta_boxes', 'tmh_event_meta_box_register');
+
+function tmh_event_meta_box_html($post) {
+    wp_nonce_field('tmh_event_save', 'tmh_event_nonce');
+    $day     = get_post_meta($post->ID, '_event_day',     true);
+    $start   = get_post_meta($post->ID, '_event_start',   true);
+    $end     = get_post_meta($post->ID, '_event_end',     true);
+    $color   = get_post_meta($post->ID, '_event_color',   true);
+    $trainer = get_post_meta($post->ID, '_event_trainer', true);
+
+    $days = [
+        'mon' => 'Montag',    'tue' => 'Dienstag', 'wed' => 'Mittwoch',
+        'thu' => 'Donnerstag','fri' => 'Freitag',  'sat' => 'Samstag', 'sun' => 'Sonntag',
+    ];
+    $colors = [
+        'yellow' => 'Gelb', 'pink' => 'Pink', 'blue' => 'Blau',
+        'green'  => 'Grün', 'gray' => 'Grau (kein Highlight)',
+    ];
+    $times = [];
+    for ($h = 8; $h <= 22; $h++) {
+        $times[] = sprintf('%02d:00', $h);
+        $times[] = sprintf('%02d:30', $h);
+    }
+    ?>
+    <table class="form-table">
+        <tr>
+            <th><label for="event_day">Tag</label></th>
+            <td>
+                <select name="event_day" id="event_day">
+                    <option value="">– wählen –</option>
+                    <?php foreach ($days as $val => $label) : ?>
+                        <option value="<?php echo esc_attr($val); ?>" <?php selected($day, $val); ?>>
+                            <?php echo esc_html($label); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="event_start">Beginn</label></th>
+            <td>
+                <select name="event_start" id="event_start">
+                    <?php foreach ($times as $t) : ?>
+                        <option value="<?php echo esc_attr($t); ?>" <?php selected($start, $t); ?>><?php echo esc_html($t); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="event_end">Ende</label></th>
+            <td>
+                <select name="event_end" id="event_end">
+                    <?php foreach ($times as $t) : ?>
+                        <option value="<?php echo esc_attr($t); ?>" <?php selected($end, $t); ?>><?php echo esc_html($t); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="event_color">Farbe</label></th>
+            <td>
+                <select name="event_color" id="event_color">
+                    <?php foreach ($colors as $val => $label) : ?>
+                        <option value="<?php echo esc_attr($val); ?>" <?php selected($color, $val); ?>><?php echo esc_html($label); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="event_trainer">Trainer/in</label></th>
+            <td>
+                <input type="text" name="event_trainer" id="event_trainer"
+                       value="<?php echo esc_attr($trainer); ?>" class="regular-text">
+            </td>
+        </tr>
+    </table>
+    <?php
+}
+
+function tmh_event_save($post_id) {
+    if (!isset($_POST['tmh_event_nonce']) || !wp_verify_nonce($_POST['tmh_event_nonce'], 'tmh_event_save')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+
+    foreach ([
+        '_event_day'     => 'event_day',
+        '_event_start'   => 'event_start',
+        '_event_end'     => 'event_end',
+        '_event_color'   => 'event_color',
+        '_event_trainer' => 'event_trainer',
+    ] as $meta => $field) {
+        if (isset($_POST[$field])) {
+            update_post_meta($post_id, $meta, sanitize_text_field($_POST[$field]));
+        }
+    }
+}
+
+add_action('save_post_tmh_event', 'tmh_event_save');
+add_action('customize_register', 'tmh_homepage_customizer');
+add_filter('wpseo_accessible_post_types', function($post_types) {
+    $post_types['training'] = 'training';
+    return $post_types;
+});
+add_action('init', 'tmh_register_nav_menus');
 add_action('customize_register', 'tmh_customizer_settings');
 add_filter('wp_kses_allowed_html', 'tmh_allow_iframe', 10, 2);
 add_action('init', 'tmh_register_training_cpt');
