@@ -29,6 +29,7 @@ body.lb-disable-scrolling {
   position: fixed;
   left: 0;
   width: 100%;
+  align-items: center;
   z-index: 10000;
   text-align: center;
   line-height: 0;
@@ -38,12 +39,9 @@ body.lb-disable-scrolling {
 
 .lightbox .lb-image {
   display: block;
-  height: auto;
-  max-width: inherit;
-  max-height: none;
+  max-width: 90vw;
+  max-height: 90vh;
   border-radius: var(--lb-border-radius);
-
-  /* Image border */
   border: var(--lb-image-border-width) solid var(--lb-image-border-color);
 }
 
