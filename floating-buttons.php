@@ -3,7 +3,7 @@
        class="floating-btn"
        aria-label="Zur Kontaktseite">
         <img src="<?php echo esc_url(get_template_directory_uri()); ?>/assets/images/contact-icon.png"
-             alt=""
+             alt="Telefon Icon"
              aria-hidden="true">
     </a>
     <div class="floating-divider" aria-hidden="true"></div>
@@ -11,7 +11,7 @@
        class="floating-btn"
        aria-label="Zur Kalenderseite">
         <img src="<?php echo esc_url(get_template_directory_uri()); ?>/assets/images/calendar-icon.png"
-             alt=""
+             alt="Symbolbild für den Veranstaltungskalender – ein aufgeschlagener Kalender mit markierten Terminen."
              aria-hidden="true">
     </a>
 </nav>

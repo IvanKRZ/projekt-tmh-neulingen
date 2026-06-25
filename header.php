@@ -15,8 +15,8 @@
 
 <div class="loading-screen" id="loadingScreen" aria-hidden="true">
     <img src="<?php echo esc_url(get_template_directory_uri()); ?>/assets/images/loading-1.webp"
-         alt="" id="loadingImg" aria-hidden="true">
-    <h1 id="loadingText" aria-live="polite"></h1>
+         alt="Eine animierte Hundetatze, die als Ladeindikator dient." id="loadingImg" aria-hidden="true">
+    <h1 id="loadingText" aria-live="polite">Bitte warten – Inhalt wird geladen</h1>
 </div>
 
 <nav class="navigation-menu" id="navMenu" aria-label="Hauptnavigation">
@@ -40,11 +40,13 @@
         ?>
             <img class="menu-logo"
                  src="<?php echo esc_url($logo_url); ?>"
-                 alt="<?php bloginfo('name'); ?> Logo">
+                 alt="<?php bloginfo('name'); ?> Logo"
+                 title="TMH Neulingen – Zur Startseite">
         <?php else : ?>
             <img class="menu-logo"
                  src="<?php echo esc_url(get_template_directory_uri()); ?>/assets/images/logo.png"
-                 alt="<?php bloginfo('name'); ?> Logo">
+                 alt="<?php bloginfo('name'); ?> Logo"
+                 title="TMH Neulingen – Zur Startseite">
         <?php endif; ?>
     </a>
 

@@ -42,7 +42,11 @@ $blog_query = new WP_Query([
                         <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                     </h2>
                     <?php
-                    $exc = trim($current_post->post_excerpt);
+                    $exc = wp_trim_words(
+                        wp_strip_all_tags(apply_filters('the_content', $current_post->post_content)),
+                        200,
+                        '…'
+                    );
                     if (empty($exc)) {
                         $exc = wp_trim_words(strip_tags($current_post->post_content), 200, '…');
                     }

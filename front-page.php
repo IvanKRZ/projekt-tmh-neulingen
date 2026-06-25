@@ -28,7 +28,7 @@ if ($front_page_id) {
 
         <?php if (!empty(trim(strip_tags($front_page_content)))) : ?>
             <section class="homepage-content" aria-label="Willkommenstext">
-                <?php echo wp_kses_post($front_page_content); ?>
+                <?php echo $front_page_content; ?>
             </section>
         <?php endif; ?>
 

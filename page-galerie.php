@@ -1,4 +1,3 @@
-<title>TMH - Galerie</title>
 <?php
 /**
  * Template Name: Galerie

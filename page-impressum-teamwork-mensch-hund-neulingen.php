@@ -6,7 +6,7 @@ get_header();
 ?>
 
 <main id="main-content">
-    <section class="legal-class" aria-label="Impressum">
+    <section class="legal-class entry-content" aria-label="Impressum">
         <?php the_content(); ?>
     </section>
 

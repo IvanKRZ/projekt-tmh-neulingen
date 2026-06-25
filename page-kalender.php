@@ -7,6 +7,9 @@ get_header();
 $base_hour = 10;
 $end_hour  = 20;
 
+$header_bg = get_option('tmh_kalender_header_bg', '#FF6EB5');
+$header_fg = get_option('tmh_kalender_header_fg', '#ffffff');
+
 $days = [
     'mon' => ['label' => 'Montag',     'abbr' => 'MON', 'col' => 2],
     'tue' => ['label' => 'Dienstag',   'abbr' => 'DIE', 'col' => 3],
@@ -35,10 +38,11 @@ if ($events_query->have_posts()) {
         if (!$day || !isset($days[$day])) continue;
         $events[$day][] = [
             'title'   => get_the_title(),
-            'start'   => get_post_meta($id, '_event_start',   true) ?: '10:00',
-            'end'     => get_post_meta($id, '_event_end',     true) ?: '11:00',
-            'color'   => get_post_meta($id, '_event_color',   true) ?: 'gray',
-            'trainer' => get_post_meta($id, '_event_trainer', true),
+            'start'   => get_post_meta($id, '_event_start',       true) ?: '10:00',
+            'end'     => get_post_meta($id, '_event_end',         true) ?: '11:00',
+            'color'   => get_post_meta($id, '_event_color',       true) ?: 'gray',
+            'trainer' => get_post_meta($id, '_event_trainer',     true),
+            'desc'    => get_post_meta($id, '_event_description', true),
         ];
     }
     wp_reset_postdata();
@@ -69,12 +73,26 @@ function tmh_group_overlapping(array $events): array {
     $groups[] = $cur_group;
     return $groups;
 }
+
+function tmh_event_data_attrs(array $event): string {
+    return sprintf(
+        'data-title="%s" data-time="%s" data-trainer="%s" data-desc="%s" data-color="%s"',
+        esc_attr($event['title']),
+        esc_attr($event['start'] . ' – ' . $event['end']),
+        esc_attr($event['trainer']),
+        esc_attr($event['desc']),
+        esc_attr($event['color'])
+    );
+}
 ?>
 
 <main id="main-content">
     <section class="kalender-section" aria-labelledby="kalender-heading">
         <div class="kalender-wrap">
-            <h1 class="kalender-title" id="kalender-heading">Trainingszeiten</h1>
+            <h1 class="kalender-title" id="kalender-heading"
+                style="background:<?php echo esc_attr($header_bg); ?>; color:<?php echo esc_attr($header_fg); ?>;">
+                Trainingszeiten
+            </h1>
 
             <div class="kalender-grid" role="grid" aria-label="Wöchentlicher Trainingsplan">
 
@@ -112,6 +130,8 @@ function tmh_group_overlapping(array $events): array {
                             $color = sanitize_html_class($event['color']); ?>
                             <article class="kalender-event kalender-event--<?php echo $color; ?>"
                                      role="gridcell"
+                                     tabindex="0"
+                                     <?php echo tmh_event_data_attrs($event); ?>
                                      style="grid-column:<?php echo $day['col']; ?>; grid-row:<?php echo $row_start; ?> / span <?php echo $span; ?>;"
                                      aria-label="<?php echo esc_attr($event['title'] . ', ' . $event['start'] . ' bis ' . $event['end'] . ($event['trainer'] ? ', ' . $event['trainer'] : '')); ?>">
                                 <span class="kalender-event__name"><?php echo esc_html($event['title']); ?></span>
@@ -128,6 +148,8 @@ function tmh_group_overlapping(array $events): array {
                                     $color = sanitize_html_class($event['color']); ?>
                                     <article class="kalender-event kalender-event--<?php echo $color; ?>"
                                              role="gridcell"
+                                             tabindex="0"
+                                             <?php echo tmh_event_data_attrs($event); ?>
                                              aria-label="<?php echo esc_attr($event['title'] . ', ' . $event['start'] . ' bis ' . $event['end'] . ($event['trainer'] ? ', ' . $event['trainer'] : '')); ?>">
                                         <span class="kalender-event__name"><?php echo esc_html($event['title']); ?></span>
                                         <span class="kalender-event__time"><?php echo esc_html($event['start'] . ' – ' . $event['end']); ?></span>
@@ -173,6 +195,81 @@ function tmh_group_overlapping(array $events): array {
         </div>
     </section>
 </main>
+
+<div id="kalender-modal" class="kalender-modal" role="dialog" aria-modal="true" aria-labelledby="km-title">
+    <div class="kalender-modal__card">
+        <div class="kalender-modal__header" id="km-header">
+            <h2 class="kalender-modal__title" id="km-title"></h2>
+            <button class="kalender-modal__close" id="km-close" aria-label="Schließen">&#x2715;</button>
+        </div>
+        <div class="kalender-modal__body">
+            <div class="kalender-modal__meta">
+                <span id="km-time"></span>
+                <span id="km-trainer"></span>
+            </div>
+            <p class="kalender-modal__desc" id="km-desc"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var modal   = document.getElementById('kalender-modal');
+    var header  = document.getElementById('km-header');
+    var title   = document.getElementById('km-title');
+    var time    = document.getElementById('km-time');
+    var trainer = document.getElementById('km-trainer');
+    var desc    = document.getElementById('km-desc');
+    var btnClose = document.getElementById('km-close');
+    var lastFocus;
+
+    var colorClasses = Array.from({length: 14}, function(_, i) { return null; });
+
+    function openModal(e) {
+        var el = e.currentTarget;
+        lastFocus = el;
+
+        title.textContent   = el.dataset.title   || '';
+        time.textContent    = el.dataset.time     || '';
+        trainer.textContent = el.dataset.trainer  || '';
+        desc.textContent    = el.dataset.desc     || '';
+
+        desc.style.display = el.dataset.desc ? '' : 'none';
+
+        header.className = 'kalender-modal__header';
+        if (el.dataset.color) {
+            header.classList.add('kalender-event--' + el.dataset.color);
+        }
+
+        modal.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+        btnClose.focus();
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        document.body.style.overflow = '';
+        if (lastFocus) lastFocus.focus();
+    }
+
+    btnClose.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+    });
+
+    document.querySelectorAll('.kalender-grid .kalender-event').forEach(function (el) {
+        el.addEventListener('click', openModal);
+        el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(e); }
+        });
+    });
+});
+</script>
 
 <?php if (!empty($events)) :
     $items = [];

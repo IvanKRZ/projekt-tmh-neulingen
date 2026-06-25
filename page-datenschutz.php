@@ -6,7 +6,7 @@ get_header();
 ?>
 
 <main id="main-content">
-    <section class="legal-class" aria-label="Datenschutzerklärung">
+    <section class="legal-class entry-content" aria-label="Datenschutzerklärung">
         <?php the_content(); ?>
     </section>
 
